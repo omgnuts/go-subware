@@ -1,4 +1,4 @@
-# Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=master)](https://travis-ci.org/omgnuts/jrouter) [![Coverage](http://gocover.io/_badge/github.com/omgnuts/jrouter?0)](http://gocover.io/github.com/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
+# Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=master)](https://travis-ci.org/omgnuts/jrouter)  [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
 
 Jrouter helps you to extend Httprouter, in an unobstrusive manner to make it easier to support
 subroutes and sublevel middleware. This allows you to easily apply different sub-level middleware that may be
