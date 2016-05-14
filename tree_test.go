@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
-package joice
+package jrouter
 
 import (
 	"fmt"
@@ -179,19 +179,19 @@ func TestTreeWildcard(t *testing.T) {
 
 	checkRequests(t, tree, testRequests{
 		{"/", false, "/", nil},
-		{"/cmd/test/", false, "/cmd/:tool/", Params{Param{"tool", "test"}}},
-		{"/cmd/test", true, "", Params{Param{"tool", "test"}}},
-		{"/cmd/test/3", false, "/cmd/:tool/:sub", Params{Param{"tool", "test"}, Param{"sub", "3"}}},
-		{"/src/", false, "/src/*filepath", Params{Param{"filepath", "/"}}},
-		{"/src/some/file.png", false, "/src/*filepath", Params{Param{"filepath", "/some/file.png"}}},
+		{"/cmd/test/", false, "/cmd/:tool/", Params{paramkv{"tool", "test"}}},
+		{"/cmd/test", true, "", Params{paramkv{"tool", "test"}}},
+		{"/cmd/test/3", false, "/cmd/:tool/:sub", Params{paramkv{"tool", "test"}, paramkv{"sub", "3"}}},
+		{"/src/", false, "/src/*filepath", Params{paramkv{"filepath", "/"}}},
+		{"/src/some/file.png", false, "/src/*filepath", Params{paramkv{"filepath", "/some/file.png"}}},
 		{"/search/", false, "/search/", nil},
-		{"/search/someth!ng+in+ünìcodé", false, "/search/:query", Params{Param{"query", "someth!ng+in+ünìcodé"}}},
-		{"/search/someth!ng+in+ünìcodé/", true, "", Params{Param{"query", "someth!ng+in+ünìcodé"}}},
-		{"/user_gopher", false, "/user_:name", Params{Param{"name", "gopher"}}},
-		{"/user_gopher/about", false, "/user_:name/about", Params{Param{"name", "gopher"}}},
-		{"/files/js/inc/framework.js", false, "/files/:dir/*filepath", Params{Param{"dir", "js"}, Param{"filepath", "/inc/framework.js"}}},
-		{"/info/gordon/public", false, "/info/:user/public", Params{Param{"user", "gordon"}}},
-		{"/info/gordon/project/go", false, "/info/:user/project/:project", Params{Param{"user", "gordon"}, Param{"project", "go"}}},
+		{"/search/someth!ng+in+ünìcodé", false, "/search/:query", Params{paramkv{"query", "someth!ng+in+ünìcodé"}}},
+		{"/search/someth!ng+in+ünìcodé/", true, "", Params{paramkv{"query", "someth!ng+in+ünìcodé"}}},
+		{"/user_gopher", false, "/user_:name", Params{paramkv{"name", "gopher"}}},
+		{"/user_gopher/about", false, "/user_:name/about", Params{paramkv{"name", "gopher"}}},
+		{"/files/js/inc/framework.js", false, "/files/:dir/*filepath", Params{paramkv{"dir", "js"}, paramkv{"filepath", "/inc/framework.js"}}},
+		{"/info/gordon/public", false, "/info/:user/public", Params{paramkv{"user", "gordon"}}},
+		{"/info/gordon/project/go", false, "/info/:user/project/:project", Params{paramkv{"user", "gordon"}, paramkv{"project", "go"}}},
 	})
 
 	checkPriorities(t, tree)
@@ -301,9 +301,9 @@ func TestTreeDupliatePath(t *testing.T) {
 	checkRequests(t, tree, testRequests{
 		{"/", false, "/", nil},
 		{"/doc/", false, "/doc/", nil},
-		{"/src/some/file.png", false, "/src/*filepath", Params{Param{"filepath", "/some/file.png"}}},
-		{"/search/someth!ng+in+ünìcodé", false, "/search/:query", Params{Param{"query", "someth!ng+in+ünìcodé"}}},
-		{"/user_gopher", false, "/user_:name", Params{Param{"name", "gopher"}}},
+		{"/src/some/file.png", false, "/src/*filepath", Params{paramkv{"filepath", "/some/file.png"}}},
+		{"/search/someth!ng+in+ünìcodé", false, "/search/:query", Params{paramkv{"query", "someth!ng+in+ünìcodé"}}},
+		{"/user_gopher", false, "/user_:name", Params{paramkv{"name", "gopher"}}},
 	})
 }
 

@@ -74,7 +74,7 @@
 //  // by the index of the parameter. This way you can also get the name (key)
 //  thirdKey   := ps[2].Key   // the name of the 3rd parameter
 //  thirdValue := ps[2].Value // the value of the 3rd parameter
-package joice
+package jrouter
 
 import (
 	"net/http"
@@ -86,7 +86,7 @@ import (
 type Handle func(http.ResponseWriter, *http.Request, Params)
 
 // Param is a single URL parameter, consisting of a key and a value.
-type Param struct {
+type paramkv struct {
 	Key   string
 	Value string
 }
@@ -94,7 +94,7 @@ type Param struct {
 // Params is a Param-slice, as returned by the router.
 // The slice is ordered, the first URL parameter is also the first slice value.
 // It is therefore safe to read values by the index.
-type Params []Param
+type Params []paramkv
 
 // ByName returns the value of the first Param which key matches the given name.
 // If no matching Param is found, an empty string is returned.

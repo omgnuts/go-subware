@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
-package joice
+package jrouter
 
 import (
 	"errors"
@@ -31,9 +31,9 @@ func (m *mockResponseWriter) WriteHeader(int) {}
 
 func TestParams(t *testing.T) {
 	ps := Params{
-		Param{"param1", "value1"},
-		Param{"param2", "value2"},
-		Param{"param3", "value3"},
+		paramkv{"param1", "value1"},
+		paramkv{"param2", "value2"},
+		paramkv{"param3", "value3"},
 	}
 	for i := range ps {
 		if val := ps.ByName(ps[i].Key); val != ps[i].Value {
@@ -51,7 +51,7 @@ func TestRouter(t *testing.T) {
 	routed := false
 	router.Handle("GET", "/user/:name", func(w http.ResponseWriter, r *http.Request, ps Params) {
 		routed = true
-		want := Params{Param{"name", "gopher"}}
+		want := Params{paramkv{"name", "gopher"}}
 		if !reflect.DeepEqual(ps, want) {
 			t.Fatalf("wrong wildcard values: want %v, got %v", want, ps)
 		}
@@ -453,7 +453,7 @@ func TestRouterLookup(t *testing.T) {
 	wantHandle := func(_ http.ResponseWriter, _ *http.Request, _ Params) {
 		routed = true
 	}
-	wantParams := Params{Param{"name", "gopher"}}
+	wantParams := Params{paramkv{"name", "gopher"}}
 
 	router := New()
 

@@ -1,52 +1,68 @@
+// Copyright 2016 Peanuts. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be found
+// in the LICENSE file.
+
 package main
 
 import (
+	"log"
 	"net/http"
-	"fmt"
-	"github.com/omgnuts/joice"
-	"github.com/jaem/nimble"
+
+	jr "github.com/omgnuts/jrouter"
 )
 
 func main() {
-	mux := joice.New()
-	mux.GET("/hello/*watch", flush("Hello!"))
-	mux.GET("/helloinline", func(w http.ResponseWriter, req *http.Request, _ joice.Params) {
-		fmt.Fprintf(w, "Hello inline!")
+	// Create a new router. The API is the same as httprouter.New()
+	router := jr.New()
+	router.GET("/public/post/:id", appHandler("viewing: /public/post/:id"))
+	router.GET("/inlinefunc", func(w http.ResponseWriter, req *http.Request, _ jr.Params) {
+		w.Write([]byte("Hello from an inline func!"))
 	})
 
-	auth := joice.New()
+	// Create a subrouter using mainRouter.Path(method, path)
+	// Add in the required middleware
+	pttRouter := router.Path("GET", "/protected/*path").
+		UseFunc(middlewareA).
+		UseHandle(middlewareB).
+		UseMWFunc(middlewareC).
+		SubRouter()
 	{
-		auth.GET("/auth/boy/:watch", flush("boy"))
-		auth.GET("/auth/girl", flush("girl"))
+		pttRouter.GET("/protected/user/:id", appHandler("viewing: /protected/user/:id"))
+		pttRouter.GET("/protected/users", appHandler("viewing: /protected/users"))
 	}
 
-	sub := joice.NewMW()
-	sub.UseParamHandle(middlewareA)
-	sub.UseParamHandle(middlewareB)
-	sub.Use(auth)
+	// Another way to fire up a subroute is as follows.
+	subware := router.Path("GET", "/admin/*path")
+	subware.UseMWFunc(middlewareC)
+	admRouter := subware.SubRouter()
+	{
+		admRouter.GET("/admin/log/:id", appHandler("viewing: /admin/log/:id"))
+		admRouter.GET("/admin/stats", appHandler("viewing: /admin/stats"))
+	}
 
-	mux.GET("/auth/*sub", sub.ServeHTTP)
-
-	n := nimble.Default()
-	n.Use(mux)
-	n.Run(":3000")
+	// Start the server with the main router
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func flush(msg string) joice.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps joice.Params) {
-		fmt.Println("...." + ps.ByName("watch"))
-		fmt.Fprintf(w, msg)
+func appHandler(msg string) jr.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps jr.Params) {
+		id := ps.ByName("id")
+		if id != "" {
+			w.Write([]byte("[PARAM] id = " + id + "\n"))
+		}
+		w.Write([]byte("[OUTPUT] " + msg + "\n"))
 	}
 }
 
-func middlewareA(w http.ResponseWriter, r *http.Request, _ joice.Params) {
-	fmt.Println("[nim.] I am middlewareA")
-	//bun := hax.GetBundle(c)
-	//bun.Set("valueA", ": from middlewareA")
+func middlewareA(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("[jr] I am middlewareA \n"))
 }
 
-func middlewareB(w http.ResponseWriter, r *http.Request, _ joice.Params) {
-	fmt.Println("[nim.] I am middlewareB")
-	//bun := hax.GetBundle(c)
-	//bun.Set("valueB", ": from middlewareB")
+func middlewareB(w http.ResponseWriter, r *http.Request, ps jr.Params) {
+	w.Write([]byte("[jr] I am middlewareB \n"))
+}
+
+func middlewareC(w http.ResponseWriter, r *http.Request, ps jr.Params, next jr.Handle) {
+	w.Write([]byte("[jr] I am middlewareC \n"))
+	next(w, r, ps)
 }
