@@ -1,9 +1,10 @@
 # Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=master)](https://travis-ci.org/omgnuts/jrouter) [![Coverage](http://gocover.io/_badge/github.com/omgnuts/jrouter?0)](http://gocover.io/github.com/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
 
-Jrouter exemplifies how you can extend Httprouter, in an unobstrusive manner to make it easier to support
+Jrouter helps you to extend Httprouter, in an unobstrusive manner to make it easier to support
 subroutes and sublevel middleware. This allows you to easily apply different sub-level middleware that may be
 specific only to certain subgroup routes. For example to apply authentication middleware at various subroutes.
 The key objective in this extension is to preserve the lightweight beauty and high performance of httprouter.
+Core changes are in jrouter.go
 
 In contrast to the [default mux][http.ServeMux] of Go's `net/http` package, this router supports variables
 in the routing pattern and matches against the request method. It also scales better. The router is optimized
