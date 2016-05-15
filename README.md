@@ -1,5 +1,8 @@
 # Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=joice)](https://travis-ci.org/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
 
+_**Note: Jrouter provides convenience methods to perform subrouting with htttprouter.
+This is not a router by itself, there are a great many out there.**_
+
 Jrouter shows how you can extend [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
 in a simple, non-intrusive manner to support subroutes and sub-level grouped middleware.
 
@@ -11,7 +14,7 @@ Jrouter uses httprouter, but you can probably modify it for other lightweight ro
 
 Hope this helps! ;)
 
-### SubRouting Example
+### Quick example
 
 Here's a basic example of how subrouting can be done with jrouter. The examples are provided in the source.
 
@@ -69,6 +72,29 @@ func middlewareC(w http.ResponseWriter, r *http.Request, ps httprouter.Params, n
 }
 ```
 
+### Full code example
+
+Here's the code to run the examples:
+
+```go
+# go run example/main.go
+```
+
+Then visit the following links on your browser.
+
+```
+http://localhost:8080/inlinefunc
+http://localhost:8080/public/post/12345
+
+http://localhost:8080/protected/user/batman
+http://localhost:8080/protected/users
+
+http://localhost:8080/admin/log/54321
+http://localhost:8080/admin/stats
+```
+
 That's all folks!
+
+---
 
 MIT License
