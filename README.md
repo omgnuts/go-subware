@@ -1,4 +1,4 @@
-# Subware [![Build Status](https://travis-ci.org/omgnuts/subware.svg?branch=joice)](https://travis-ci.org/omgnuts/subware) [![GoDoc](https://godoc.org/github.com/omgnuts/subware?status.svg)](http://godoc.org/github.com/omgnuts/subware)
+# Subware [![Build Status](https://travis-ci.org/omgnuts/subware.svg?branch=master)](https://travis-ci.org/omgnuts/subware)  [![GoDoc](https://godoc.org/github.com/omgnuts/subware?status.svg)](http://godoc.org/github.com/omgnuts/subware)
 
 Subware shows how you can extend [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
 in a simple, non-intrusive manner to support subroutes and sub-level grouped middleware.
