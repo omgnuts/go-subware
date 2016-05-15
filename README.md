@@ -1,35 +1,32 @@
-# Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=joice)](https://travis-ci.org/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
+# Subware [![Build Status](https://travis-ci.org/omgnuts/subware.svg?branch=joice)](https://travis-ci.org/omgnuts/subware) [![GoDoc](https://godoc.org/github.com/omgnuts/subware?status.svg)](http://godoc.org/github.com/omgnuts/subware)
 
-_**Note: Jrouter provides convenience methods to perform subrouting with htttprouter.
-This is not a router by itself, there are a great many out there.**_
-
-Jrouter shows how you can extend [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
+Subware shows how you can extend [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
 in a simple, non-intrusive manner to support subroutes and sub-level grouped middleware.
 
 This allows you to easily apply different sub-level middleware that may be
 specific only to certain subgroup routes. For example to apply authentication middleware at various subroutes.
 The key purpose in this extension is to preserve the lightweight beauty and high performance of httprouter.
 
-Jrouter uses httprouter, but you can probably modify it for other lightweight routers as well.
+Subware uses httprouter, but you can probably modify it for other lightweight routers as well.
 
 Hope this helps! ;)
 
 ### Quick example
 
-Here's a basic example of how subrouting can be done with jrouter. The examples are provided in the source.
+Here's a basic example of how subrouting can be done with subware. The examples are provided in the source.
 
 ```go
 import (
     "log"
     "net/http"
-    jr "github.com/omgnuts/jrouter"
+    "github.com/omgnuts/subware"
 )
 
 func main() {
     router := httprouter.New()
     router.GET("/", index)
 
-    subrouter := jr.Path(router, "GET", "/protected/*path").
+    subrouter := subware.Path(router, "GET", "/protected/*path").
         UseFunc(middlewareA).
         UseHandle(middlewareB).
         UseMWFunc(middlewareC).
@@ -59,15 +56,15 @@ func appHandler(msg string) httprouter.Handle {
 }
 
 func middlewareA(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("[jr] I am middlewareA \n"))
+	w.Write([]byte("[sw] I am middlewareA \n"))
 }
 
 func middlewareB(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Write([]byte("[jr] I am middlewareB \n"))
+	w.Write([]byte("[sw] I am middlewareB \n"))
 }
 
 func middlewareC(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
-	w.Write([]byte("[jr] I am middlewareC \n"))
+	w.Write([]byte("[sw] I am middlewareC \n"))
 	next(w, r, ps)
 }
 ```
@@ -92,6 +89,9 @@ http://localhost:8080/protected/users
 http://localhost:8080/admin/log/54321
 http://localhost:8080/admin/stats
 ```
+
+_**Final Note: Subware provides convenience methods to perform subrouting with htttprouter.
+This is not a router by itself, there are a great many out there.**_
 
 That's all folks!
 

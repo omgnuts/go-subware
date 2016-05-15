@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	jr "github.com/omgnuts/jrouter"
+	"github.com/omgnuts/subware"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 
 	// Create a subrouter using mainRouter.Path(method, path)
 	// Add in the required middleware
-	pttRouter := jr.Path(router, "GET", "/protected/*path").
+	pttRouter := subware.Path(router, "GET", "/protected/*path").
 		UseFunc(middlewareA).
 		UseHandle(middlewareB).
 		UseMWFunc(middlewareC).
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Another way to fire up a subroute is as follows.
-	subware := jr.Path(router, "GET", "/admin/*path")
+	subware := subware.Path(router, "GET", "/admin/*path")
 	subware.UseMWFunc(middlewareC)
 	admRouter := subware.SubRouter()
 	{
@@ -56,14 +56,14 @@ func appHandler(msg string) httprouter.Handle {
 }
 
 func middlewareA(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("[jr] I am middlewareA \n"))
+	w.Write([]byte("[sw] I am middlewareA \n"))
 }
 
 func middlewareB(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Write([]byte("[jr] I am middlewareB \n"))
+	w.Write([]byte("[sw] I am middlewareB \n"))
 }
 
 func middlewareC(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
-	w.Write([]byte("[jr] I am middlewareC \n"))
+	w.Write([]byte("[sw] I am middlewareC \n"))
 	next(w, r, ps)
 }

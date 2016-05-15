@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
-package jrouter
+package subware
 
 import (
 	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -28,7 +29,7 @@ func (sw *Subware) SubRouter() *httprouter.Router {
 type Subware struct {
 	middleware middleware
 	handles    []mwFunc
-	locked 		 bool
+	locked     bool
 }
 
 // The next http.HandlerFunc is automatically called after the Handler is executed.
@@ -113,7 +114,7 @@ func build(fns []mwFunc) middleware {
 		next = empty()
 	}
 
-	return middleware{ fns[0], &next }
+	return middleware{fns[0], &next}
 }
 
 func empty() middleware {
