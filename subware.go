@@ -10,14 +10,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func Path(r *httprouter.Router, method string, path string) *Subware {
-	sr := &Subware{}
+func Path(r *httprouter.Router, method string, path string) *subware {
+	sr := &subware{}
 	r.Handle(method, path, sr.serve)
 	return sr
 }
 
 // SubRouter returns the router generated for the sub route
-func (sw *Subware) SubRouter() *httprouter.Router {
+func (sw *subware) SubRouter() *httprouter.Router {
 	r := httprouter.New()
 	sw.Use(r).middleware = build(sw.handles)
 	sw.locked = true
@@ -26,7 +26,7 @@ func (sw *Subware) SubRouter() *httprouter.Router {
 
 // Subware is a stack of Middleware Handlers that can be invoked as an http.Handler.
 // The middleware stack is run in the sequence that they are added to the stack.
-type Subware struct {
+type subware struct {
 	middleware middleware
 	handles    []mwFunc
 	locked     bool
@@ -34,27 +34,27 @@ type Subware struct {
 
 // The next http.HandlerFunc is automatically called after the Handler is executed.
 // If the Handler writes to the ResponseWriter, the next http.HandlerFunc should not be invoked.
-func (sw *Subware) serve(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (sw *subware) serve(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sw.middleware.serve(w, r, ps)
 }
 
 // UseHandler adds a http.Handler onto the middleware stack.
-func (sw *Subware) Use(handler http.Handler) *Subware {
+func (sw *subware) Use(handler http.Handler) *subware {
 	return sw.UseMWFunc(wrap(handler))
 }
 
 // UseHandlerFunc adds a http.HandlerFunc onto the middleware stack.
-func (sw *Subware) UseFunc(handlerFunc http.HandlerFunc) *Subware {
+func (sw *subware) UseFunc(handlerFunc http.HandlerFunc) *subware {
 	return sw.UseMWFunc(wrapFunc(handlerFunc))
 }
 
 // Use adds a Handle onto the middleware stack.
-func (sw *Subware) UseHandle(handle httprouter.Handle) *Subware {
+func (sw *subware) UseHandle(handle httprouter.Handle) *subware {
 	return sw.UseMWFunc(wrapHandle(handle))
 }
 
 // UseFunc adds a mwFunc function onto the middleware stack.
-func (sw *Subware) UseMWFunc(fn mwFunc) *Subware {
+func (sw *subware) UseMWFunc(fn mwFunc) *subware {
 	if !sw.locked {
 		sw.handles = append(sw.handles, fn)
 	} else {
