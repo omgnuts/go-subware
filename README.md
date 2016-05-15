@@ -1,9 +1,15 @@
-# Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=master)](https://travis-ci.org/omgnuts/jrouter) [![Coverage](http://gocover.io/_badge/github.com/omgnuts/jrouter?0)](http://gocover.io/github.com/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
+# Jrouter [![Build Status](https://travis-ci.org/omgnuts/jrouter.svg?branch=joice)](https://travis-ci.org/omgnuts/jrouter) [![GoDoc](https://godoc.org/github.com/omgnuts/jrouter?status.svg)](http://godoc.org/github.com/omgnuts/jrouter)
 
-Jrouter shows how you can extend Httprouter in a simple, non-intrusive manner to make it easier to support
-subroutes and sublevel middleware. This allows you to easily apply different sub-level middleware that may be
+Jrouter shows how you can extend [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
+in a simple, non-intrusive manner to support subroutes and sub-level grouped middleware.
+
+This allows you to easily apply different sub-level middleware that may be
 specific only to certain subgroup routes. For example to apply authentication middleware at various subroutes.
-The key objective in this extension is to preserve the lightweight beauty and high performance of httprouter.
+The key purpose in this extension is to preserve the lightweight beauty and high performance of httprouter.
+
+Jrouter uses httprouter, but you can probably modify it for other lightweight routers as well.
+
+Hope this helps! ;)
 
 ### SubRouting Example
 
@@ -62,3 +68,7 @@ func middlewareC(w http.ResponseWriter, r *http.Request, ps httprouter.Params, n
 	next(w, r, ps)
 }
 ```
+
+That's all folks!
+
+MIT License
