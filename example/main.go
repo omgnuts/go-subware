@@ -8,20 +8,21 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
 	jr "github.com/omgnuts/jrouter"
 )
 
 func main() {
 	// Create a new router. The API is the same as httprouter.New()
-	router := jr.New()
+	router := httprouter.New()
 	router.GET("/public/post/:id", appHandler("viewing: /public/post/:id"))
-	router.GET("/inlinefunc", func(w http.ResponseWriter, req *http.Request, _ jr.Params) {
+	router.GET("/inlinefunc", func(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		w.Write([]byte("Hello from an inline func!"))
 	})
 
 	// Create a subrouter using mainRouter.Path(method, path)
 	// Add in the required middleware
-	pttRouter := router.Path("GET", "/protected/*path").
+	pttRouter := jr.Path(router, "GET", "/protected/*path").
 		UseFunc(middlewareA).
 		UseHandle(middlewareB).
 		UseMWFunc(middlewareC).
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	// Another way to fire up a subroute is as follows.
-	subware := router.Path("GET", "/admin/*path")
+	subware := jr.Path(router, "GET", "/admin/*path")
 	subware.UseMWFunc(middlewareC)
 	admRouter := subware.SubRouter()
 	{
@@ -44,8 +45,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func appHandler(msg string) jr.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps jr.Params) {
+func appHandler(msg string) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		id := ps.ByName("id")
 		if id != "" {
 			w.Write([]byte("[PARAM] id = " + id + "\n"))
@@ -58,11 +59,11 @@ func middlewareA(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("[jr] I am middlewareA \n"))
 }
 
-func middlewareB(w http.ResponseWriter, r *http.Request, ps jr.Params) {
+func middlewareB(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Write([]byte("[jr] I am middlewareB \n"))
 }
 
-func middlewareC(w http.ResponseWriter, r *http.Request, ps jr.Params, next jr.Handle) {
+func middlewareC(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 	w.Write([]byte("[jr] I am middlewareC \n"))
 	next(w, r, ps)
 }

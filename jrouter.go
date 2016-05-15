@@ -6,18 +6,18 @@ package jrouter
 
 import (
 	"net/http"
+	"github.com/julienschmidt/httprouter"
 )
 
-// Path sets up the prefix for the subroute
-func (r *Router) Path(method string, path string) *Subware {
+func Path(r *httprouter.Router, method string, path string) *Subware {
 	sr := &Subware{}
 	r.Handle(method, path, sr.serve)
 	return sr
 }
 
 // SubRouter returns the router generated for the sub route
-func (sw *Subware) SubRouter() *Router {
-	r := New()
+func (sw *Subware) SubRouter() *httprouter.Router {
+	r := httprouter.New()
 	sw.Use(r).middleware = build(sw.handles)
 	sw.locked = true
 	return r
@@ -33,7 +33,7 @@ type Subware struct {
 
 // The next http.HandlerFunc is automatically called after the Handler is executed.
 // If the Handler writes to the ResponseWriter, the next http.HandlerFunc should not be invoked.
-func (sw *Subware) serve(w http.ResponseWriter, r *http.Request, ps Params) {
+func (sw *Subware) serve(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sw.middleware.serve(w, r, ps)
 }
 
@@ -48,7 +48,7 @@ func (sw *Subware) UseFunc(handlerFunc http.HandlerFunc) *Subware {
 }
 
 // Use adds a Handle onto the middleware stack.
-func (sw *Subware) UseHandle(handle Handle) *Subware {
+func (sw *Subware) UseHandle(handle httprouter.Handle) *Subware {
 	return sw.UseMWFunc(wrapHandle(handle))
 }
 
@@ -64,7 +64,7 @@ func (sw *Subware) UseMWFunc(fn mwFunc) *Subware {
 
 // Wrap converts a http.Handler into a HandlerFunc
 func wrap(handler http.Handler) mwFunc {
-	return func(w http.ResponseWriter, r *http.Request, ps Params, next Handle) {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		handler.ServeHTTP(w, r)
 		next(w, r, ps)
 	}
@@ -72,15 +72,15 @@ func wrap(handler http.Handler) mwFunc {
 
 // wrapFunc converts a http.HandlerFunc into a HandlerFunc.
 func wrapFunc(fn http.HandlerFunc) mwFunc {
-	return func(w http.ResponseWriter, r *http.Request, ps Params, next Handle) {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		fn(w, r)
 		next(w, r, ps)
 	}
 }
 
 // wrapHandle converts a httprouter.Handle into a .HandlerFunc.
-func wrapHandle(handle Handle) mwFunc {
-	return func(w http.ResponseWriter, r *http.Request, ps Params, next Handle) {
+func wrapHandle(handle httprouter.Handle) mwFunc {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		handle(w, r, ps)
 		next(w, r, ps)
 	}
@@ -88,7 +88,7 @@ func wrapHandle(handle Handle) mwFunc {
 
 // The stack is traversed using a linked-list handler interface that provides
 // every middleware a forward reference to the next middleware in the stack.
-type mwFunc func(http.ResponseWriter, *http.Request, Params, Handle)
+type mwFunc func(http.ResponseWriter, *http.Request, httprouter.Params, httprouter.Handle)
 
 // Each Middleware should yield to the next middleware in the chain by invoking the next http.HandlerFunc
 type middleware struct {
@@ -98,7 +98,7 @@ type middleware struct {
 
 // The next http.HandlerFunc is automatically called after the Handler is executed.
 // If the Handler writes to the ResponseWriter, the next http.HandlerFunc should not be invoked.
-func (m middleware) serve(w http.ResponseWriter, r *http.Request, ps Params) {
+func (m middleware) serve(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	m.fn(w, r, ps, m.next.serve)
 }
 
@@ -118,7 +118,7 @@ func build(fns []mwFunc) middleware {
 
 func empty() middleware {
 	return middleware{
-		func(http.ResponseWriter, *http.Request, Params, Handle) { /* do nothing */ },
+		func(http.ResponseWriter, *http.Request, httprouter.Params, httprouter.Handle) { /* do nothing */ },
 		&middleware{},
 	}
 }
