@@ -53,11 +53,10 @@ func (sw *subware) UseHandle(handle httprouter.Handle) *subware {
 
 // UseFunc adds a mwFunc function onto the middleware stack.
 func (sw *subware) UseMWFunc(fn mwFunc) *subware {
-	if !sw.locked {
-		sw.handles = append(sw.handles, fn)
-	} else {
-		panic("Middleware stack must be added before SubRouter() is called")
+	if sw.locked {
+		panic("SubRouter() has been already called. Middleware stack must be added calling subrouter.")
 	}
+	sw.handles = append(sw.handles, fn)
 	return sw
 }
 
