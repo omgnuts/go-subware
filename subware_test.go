@@ -232,7 +232,7 @@ func TestNoUseAfterLocked(t *testing.T) {
 	})
 }
 
-func TestNegroniRun(t *testing.T) {
+func TestSubwareRun(t *testing.T) {
 	router := httprouter.New()
 	r1 := Path(router, "GET", "/").SubRouter()
 	// just test that Run doesn't bomb
