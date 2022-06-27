@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/omgnuts/subware"
+	"github.com/omgnuts/go-subware"
 )
 
 func main() {

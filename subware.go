@@ -22,6 +22,16 @@ func (sw *subware) SubRouter() *httprouter.Router {
 	return r
 }
 
+// With returns a new Subware instance that is a combination of the previous
+// receiver's handlers and the provided handlers.
+func (sw *subware) With(fns ...mwFunc) *subware {
+	newHandles := make([]mwFunc, len(sw.handles))
+	copy(newHandles, sw.handles)
+	return &subware{
+		handles: append(newHandles, fns...),
+	}
+}
+
 // Subware is a stack of Middleware Handlers that can be invoked as an http.Handler.
 // The middleware stack is run in the sequence that they are added to the stack.
 type subware struct {
@@ -53,6 +63,9 @@ func (sw *subware) UseHandle(handle httprouter.Handle) *subware {
 
 // UseFunc adds a mwFunc function onto the middleware stack.
 func (sw *subware) UseMWFunc(fn mwFunc) *subware {
+	if fn == nil {
+		panic("mwFunc cannot be nil")
+	}
 	if sw.locked {
 		panic("SubRouter() has been already called. Middleware stack must be added calling subrouter.")
 	}
@@ -62,6 +75,9 @@ func (sw *subware) UseMWFunc(fn mwFunc) *subware {
 
 // Wrap converts a http.Handler into a HandlerFunc
 func wrap(handler http.Handler) mwFunc {
+	if handler == nil {
+		return nil
+	}
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		handler.ServeHTTP(w, r)
 		next(w, r, ps)
@@ -70,6 +86,9 @@ func wrap(handler http.Handler) mwFunc {
 
 // wrapFunc converts a http.HandlerFunc into a HandlerFunc.
 func wrapFunc(fn http.HandlerFunc) mwFunc {
+	if fn == nil {
+		return nil
+	}
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		fn(w, r)
 		next(w, r, ps)
@@ -78,6 +97,9 @@ func wrapFunc(fn http.HandlerFunc) mwFunc {
 
 // wrapHandle converts a httprouter.Handle into a .HandlerFunc.
 func wrapHandle(handle httprouter.Handle) mwFunc {
+	if handle == nil {
+		return nil
+	}
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params, next httprouter.Handle) {
 		handle(w, r, ps)
 		next(w, r, ps)
@@ -116,7 +138,11 @@ func build(fns []mwFunc) middleware {
 
 func empty() middleware {
 	return middleware{
-		func(http.ResponseWriter, *http.Request, httprouter.Params, httprouter.Handle) { /* do nothing */ },
+		voidMwFunc,
 		&middleware{},
 	}
+}
+
+func voidMwFunc(http.ResponseWriter, *http.Request, httprouter.Params, httprouter.Handle) {
+	/* do nothing */
 }
